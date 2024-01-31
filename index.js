@@ -10,7 +10,7 @@ app.use(cors())
 app.use(express.json())
 
 app.get('/', (req, res) => {
-    res.send('Hello World!')
+  res.send('Hello World!')
 })
 
 
@@ -36,9 +36,16 @@ async function run() {
     const userCollection = client.db('somitiManagement').collection('user')
 
     app.post('/user', async (req, res) => {
-        const user = req.body;
-        const result = await userCollection.insertOne(user);
-        res.send(result)
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+      res.send(result)
+    })
+
+    // get all user from the database
+    app.get('/users', async (req, res) => {
+        const users = userCollection.find();
+        const result = await users.toArray();
+        res.send(result);
     })
 
 
@@ -56,5 +63,5 @@ run().catch(console.dir);
 
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+  console.log(`Example app listening on port ${port}`)
 })
