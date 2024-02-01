@@ -15,7 +15,7 @@ app.get('/', (req, res) => {
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.7dcoggr.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -46,6 +46,20 @@ async function run() {
         const users = userCollection.find();
         const result = await users.toArray();
         res.send(result);
+    })
+
+    // total users length
+    app.get('/userLength', async (req, res) => {
+      const count = await userCollection.estimatedDocumentCount();
+      res.send({count})
+    })
+
+    // get single member from database
+    app.get('/user/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = {_id: new ObjectId(id)};
+      const result = await userCollection.findOne(filter);
+      res.send(result);
     })
 
 
