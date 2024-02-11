@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const jwt = require('jsonwebtoken')
 const port = process.env.PORT || 5000;
 const cors = require('cors')
 require('dotenv').config()
@@ -35,6 +36,15 @@ async function run() {
     const somitiCollection = client.db('somitiManagement').collection('somiti')
     const userCollection = client.db('somitiManagement').collection('user')
 
+    // jwt related api
+    app.post('/jwt', async (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: '1h'
+      });
+      res.send({ token })
+    })
+
     app.post('/user', async (req, res) => {
       const user = req.body;
       const query = { email: user.email }
@@ -46,8 +56,22 @@ async function run() {
       res.send(result)
     })
 
+    // admin related api
+    app.patch('/user/admin/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          role: 'admin'
+        }
+      }
+      const result = await userCollection.updateOne(query, updatedDoc);
+      res.send(result)
+    })
+
     // get all user from the database
     app.get('/users', async (req, res) => {
+      console.log(req.headers);
       const users = userCollection.find();
       const result = await users.toArray();
       res.send(result);
@@ -56,7 +80,7 @@ async function run() {
     // delete single user
     app.delete('/user/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const result = await userCollection.deleteOne(query);
       res.send(result)
     })
