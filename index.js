@@ -91,7 +91,7 @@ async function run() {
     })
 
     // get all user from the database
-    app.get('/users', verifyToken, verifyAdmin,  async (req, res) => {
+    app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
       console.log(req.headers);
       const users = userCollection.find();
       const result = await users.toArray();
@@ -144,7 +144,19 @@ async function run() {
       res.send(result);
     })
 
+    // loan related api
 
+    app.post('/applyLoan', async (req, res) => {
+      const applyLoan = req.body;
+      const result = await somitiCollection.insertOne(applyLoan);
+      res.send(result);
+    })
+
+    app.get('/allAppliedLoan', async (req, res) => {
+      const apply = somitiCollection.find();
+      const result = await apply.toArray();
+      res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
