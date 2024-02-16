@@ -122,6 +122,8 @@ async function run() {
       res.send(result)
     })
 
+
+
     // delete single user
     app.delete('/user/:id', async (req, res) => {
       const id = req.params.id;
@@ -152,9 +154,34 @@ async function run() {
       res.send(result);
     })
 
-    app.get('/allAppliedLoan', async (req, res) => {
-      const apply = somitiCollection.find();
-      const result = await apply.toArray();
+    app.get('/allAppliedLoan', verifyToken, verifyAdmin, async (req, res) => {
+
+      let query = {};
+      if(req.query?.status){
+        query = {status: req.query?.status}
+      }
+      const result = await somitiCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    // update apply loan status 
+    app.patch('/activeLoan/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const updatedLoan = {
+        $set: {
+          status: 'confirmed'
+        }
+      }
+      const result = await somitiCollection.updateOne(query, updatedLoan);
+      res.send(result);
+    })
+
+    // delete single applied loan information from database
+    app.delete('/applyLoan/:id', verifyToken, verifyAdmin, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await somitiCollection.deleteOne(query);
       res.send(result);
     })
 
