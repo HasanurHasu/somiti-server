@@ -177,6 +177,14 @@ async function run() {
       res.send(result);
     })
 
+    // single user loan info
+    app.get('/loanInfo/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await somitiCollection.findOne(query);
+      res.send(result);
+    })
+
     // delete single applied loan information from database
     app.delete('/applyLoan/:id', verifyToken, verifyAdmin, async (req, res) => {
       const id = req.params.id;
