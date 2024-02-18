@@ -92,7 +92,7 @@ async function run() {
 
     // get all user from the database
     app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
-      console.log(req.headers);
+      // console.log(req.headers);
       const users = userCollection.find();
       const result = await users.toArray();
       res.send(result);
@@ -121,8 +121,6 @@ async function run() {
       const result = await userCollection.updateOne(query, updatedDoc);
       res.send(result)
     })
-
-
 
     // delete single user
     app.delete('/user/:id', async (req, res) => {
@@ -157,8 +155,8 @@ async function run() {
     app.get('/allAppliedLoan', verifyToken, verifyAdmin, async (req, res) => {
 
       let query = {};
-      if(req.query?.status){
-        query = {status: req.query?.status}
+      if (req.query?.status) {
+        query = { status: req.query?.status }
       }
       const result = await somitiCollection.find(query).toArray();
       res.send(result);
@@ -167,7 +165,7 @@ async function run() {
     // update apply loan status 
     app.patch('/activeLoan/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const updatedLoan = {
         $set: {
           status: 'confirmed'
@@ -178,9 +176,9 @@ async function run() {
     })
 
     // single user loan info
-    app.get('/loanInfo/:id', async(req, res) => {
+    app.get('/loanInfo/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const result = await somitiCollection.findOne(query);
       res.send(result);
     })
@@ -190,6 +188,19 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await somitiCollection.deleteOne(query);
+      res.send(result);
+    })
+
+    app.put('/loanInfo/:id', async (req, res) => {
+      const id = req.params.id;
+      const newLoanInfo = req.body;
+      const query = { _id: new ObjectId(id) };
+      const update = {
+        $push: {
+          'loanInfo': newLoanInfo
+        }
+      };
+      const result = await somitiCollection.updateOne(query, update)
       res.send(result);
     })
 
