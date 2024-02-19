@@ -146,6 +146,18 @@ async function run() {
 
     // loan related api
 
+    app.get('/userInfo/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const result = await userCollection.findOne(query);
+      if (result) {
+        const userId = result.userId;
+        res.send({ userId });
+      } else {
+        res.status(404).send('result not found');
+      }
+    })
+
     app.post('/applyLoan', async (req, res) => {
       const applyLoan = req.body;
       const result = await somitiCollection.insertOne(applyLoan);
@@ -163,15 +175,31 @@ async function run() {
     })
 
     // update apply loan status 
-    app.patch('/activeLoan/:id', async (req, res) => {
+    app.patch('/loanInfo/:id', async (req, res) => {
       const id = req.params.id;
+      const newLoanInfo = req.body;
       const query = { _id: new ObjectId(id) };
-      const updatedLoan = {
+      const update = {
         $set: {
-          status: 'confirmed'
+          userId: newLoanInfo.userId,
+          name: newLoanInfo.name,
+          date: newLoanInfo.date,
+          email: newLoanInfo.email,
+          email: newLoanInfo.email,
+          mobile: newLoanInfo.mobile,
+          religion: newLoanInfo.religion,
+          fatherName: newLoanInfo.fatherName,
+          matherName: newLoanInfo.matherName,
+          presentAddress: newLoanInfo.presentAddress,
+          permanentAddress: newLoanInfo.permanentAddress,
+          NID: newLoanInfo.NID,
+          loanInfo: newLoanInfo.loanInfo,
+          amount: newLoanInfo.amount,
+          status: newLoanInfo.status,
+          totalAmount: newLoanInfo.totalAmount
         }
-      }
-      const result = await somitiCollection.updateOne(query, updatedLoan);
+      };
+      const result = await somitiCollection.updateOne(query, update)
       res.send(result);
     })
 
@@ -191,7 +219,7 @@ async function run() {
       res.send(result);
     })
 
-    app.put('/loanInfo/:id', async (req, res) => {
+    app.put('/paidLoan/:id', async (req, res) => {
       const id = req.params.id;
       const newLoanInfo = req.body;
       const query = { _id: new ObjectId(id) };
