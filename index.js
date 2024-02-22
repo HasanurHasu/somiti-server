@@ -230,6 +230,14 @@ async function run() {
       };
       const result = await somitiCollection.updateOne(query, update)
       res.send(result);
+    });
+
+    // user related api
+    app.get('/userLoan', async (req, res) => {
+      const email = req.query?.email;
+      const query = { email };
+      const result = await somitiCollection.find(query).toArray();
+      res.send(result);
     })
 
     // Send a ping to confirm a successful connection
